@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from timeit import default_timer as timer
+from matplotlib import pyplot as plt
+from tqdm import tqdm
+from statistics import mean
+import random
+from search import linear_search, binary_search
+
+
+def generate_sorted_data(sz):
+    """
+    Возвращает массив чисел без повторов, отсортированный в порядке
+    возрастания
+    """
+    a = [1]
+    for i in range(sz - 1):
+        a.append(a[i] + random.randint(1, 10))
+    return a
+
+
+def measure_search_time(search_alg, sz, repeats):
+    """
+    Возвращает результат замеров скорости выполнения поиска в массиве длины sz.
+    """
+    data = generate_sorted_data(sz)
+    results = []
+    for i in range(repeats):
+        v = random.choice(data)
+        start = timer()
+        search_alg(data, v)
+        end = timer()
+        results.append(end - start)
+    return mean(results)
+
+
+def main():
+    sizes = []
+    avg_time1 = []
+    avg_time2 = []
+    for sz in tqdm(range(3, 500, 10)):
+        sizes.append(sz)
+        avg_time1.append(measure_search_time(linear_search, sz, 5000))
+        avg_time2.append(measure_search_time(binary_search, sz, 5000))
+    plt.plot(sizes, avg_time1)
+    plt.plot(sizes, avg_time2)
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
